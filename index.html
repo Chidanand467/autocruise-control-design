@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Cruise Control System — Control Systems Portfolio Project</title>
+<meta name="description" content="Design, simulation and comparative analysis of P, PI, PD and PID controllers for an automotive cruise control system in MATLAB Simulink." />
+<meta property="og:title" content="Automotive Cruise Control System — MATLAB Simulink" />
+<meta property="og:description" content="Control engineering portfolio project: transfer function modeling, PID tuning, disturbance rejection and controller benchmarking." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter','ui-sans-serif','system-ui'],
+        mono: ['"JetBrains Mono"','ui-monospace','monospace'],
+      },
+      colors: {
+        bg:         '#0a0e14',
+        surface:    '#0f141c',
+        elevated:   '#141b26',
+        border:     '#1f2937',
+        muted:      '#94a3b8',
+        fg:         '#e5e7eb',
+        primary:    '#38bdf8',
+        primaryDim: '#0ea5e9',
+        success:    '#22d3a5',
+        warning:    '#fbbf24',
+      },
+    }
+  }
+}
+</script>
+<style>
+  html,body{background:#0a0e14;color:#e5e7eb;font-family:Inter,system-ui,sans-serif}
+  .glass{background:linear-gradient(180deg,rgba(20,27,38,.7),rgba(15,20,28,.55));backdrop-filter:blur(8px);border:1px solid rgba(31,41,55,.8)}
+  .ring-glow:hover{box-shadow:0 0 0 1px rgba(56,189,248,.4),0 8px 30px -8px rgba(56,189,248,.45)}
+  .grid-bg{background-image:linear-gradient(rgba(56,189,248,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.08) 1px,transparent 1px);background-size:48px 48px}
+  .text-gradient{background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .font-mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  html{scroll-behavior:smooth}
+  section[id]{scroll-margin-top:5rem}
+  table thead{background:rgba(20,27,38,.7)}
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- NAV -->
+<header class="sticky top-0 z-40 glass border-b border-border/60">
+  <div class="mx-auto max-w-7xl px-6 h-14 flex items-center justify-between">
+    <a href="#top" class="flex items-center gap-2 font-mono text-sm">
+      <span class="inline-flex w-7 h-7 items-center justify-center rounded-md bg-sky-400/15 text-sky-400">⏱</span>
+      <span>cruise_control.sim</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-1 text-xs font-mono text-muted">
+      <a href="#top" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Overview</a>
+      <a href="#problem" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Problem</a>
+      <a href="#methodology" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Methodology</a>
+      <a href="#model" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Model</a>
+      <a href="#design" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Design</a>
+      <a href="#results" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Results</a>
+      <a href="#scope" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Scope</a>
+    </nav>
+    <a href="https://github.com" target="_blank" rel="noreferrer"
+       class="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-elevated">
+      GitHub
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="top" class="relative overflow-hidden">
+  <div class="absolute inset-0 grid-bg opacity-40" style="mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)"></div>
+  <div class="relative mx-auto max-w-7xl px-6 pt-20 pb-24">
+    <div class="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs font-mono text-muted">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+      CONTROL SYSTEMS · MINI-PROJECT
+    </div>
+    <h1 class="mt-6 text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.05] tracking-tight max-w-4xl">
+      <span class="text-gradient">Design &amp; Simulation</span> of an Automotive Cruise Control System
+      <span class="text-muted"> using MATLAB Simulink.</span>
+    </h1>
+    <p class="mt-6 max-w-2xl text-base md:text-lg text-muted leading-relaxed">
+      A generic, vehicle-agnostic study of closed-loop longitudinal speed control —
+      transfer-function modeling, PID tuning, disturbance rejection, and a head-to-head
+      benchmark of P, PI, PD and PID controllers.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="cruise_control_report.md" download
+         class="inline-flex items-center gap-2 rounded-lg bg-sky-400 text-slate-900 px-5 py-2.5 text-sm font-medium hover:opacity-90 ring-glow">
+        ⬇ Download Report
+      </a>
+      <a href="https://github.com" target="_blank" rel="noreferrer"
+         class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface/60 px-5 py-2.5 text-sm font-medium hover:bg-elevated">
+        GitHub Repository
+      </a>
+      <a href="#results" class="inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm text-muted hover:text-fg">See results →</a>
+    </div>
+
+    <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="glass rounded-xl p-4"><div class="font-mono text-2xl text-sky-400">0</div><div class="text-xs text-muted mt-1">Steady-state error with PI</div></div>
+      <div class="glass rounded-xl p-4"><div class="font-mono text-2xl text-sky-400">14.59 s</div><div class="text-xs text-muted mt-1">Best rise time</div></div>
+      <div class="glass rounded-xl p-4"><div class="font-mono text-2xl text-sky-400">4</div><div class="text-xs text-muted mt-1">Controllers benchmarked</div></div>
+      <div class="glass rounded-xl p-4"><div class="font-mono text-2xl text-sky-400">1/(Ms+B)</div><div class="text-xs text-muted mt-1">Generic plant model</div></div>
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-2">
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">MATLAB</span>
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">Simulink</span>
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">Control System Toolbox</span>
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">PID Tuner</span>
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">Transfer Functions</span>
+      <span class="text-xs font-mono rounded-md border border-border bg-surface/60 px-2.5 py-1 text-muted">Laplace</span>
+    </div>
+  </div>
+</section>
+
+<!-- INTRO -->
+<section id="introduction" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">01 — Introduction</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">What is cruise control?</h2>
+  <div class="grid gap-8 md:grid-cols-3">
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold mb-2 text-sky-400">Definition</h4><p class="text-sm text-muted leading-relaxed">Cruise control is a closed-loop longitudinal controller that automatically modulates throttle effort to hold a driver-selected vehicle speed.</p></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold mb-2 text-sky-400">Why it matters</h4><p class="text-sm text-muted leading-relaxed">It reduces driver fatigue on highways, improves fuel economy through smoother torque demand and forms the foundation for ADAS features such as adaptive cruise.</p></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold mb-2 text-sky-400">Role of feedback</h4><p class="text-sm text-muted leading-relaxed">Feedback continuously corrects the throttle command based on the measured speed error, rejecting road slope, payload and aerodynamic disturbances.</p></div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section id="problem" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">02 — Problem Statement</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Maintaining constant speed under disturbance</h2>
+  <div class="grid gap-6 md:grid-cols-2">
+    <div class="glass rounded-2xl p-7">
+      <p class="text-muted leading-relaxed">A passenger vehicle must hold a target speed despite continuously changing road conditions. Without feedback, even a small uphill grade or load change produces significant steady-state speed error and a degraded driving experience.</p>
+    </div>
+    <ul class="grid grid-cols-2 gap-3">
+      <li class="glass rounded-xl p-4 text-sm">Road slopes &amp; grade changes</li>
+      <li class="glass rounded-xl p-4 text-sm">Vehicle load variation</li>
+      <li class="glass rounded-xl p-4 text-sm">External disturbances</li>
+      <li class="glass rounded-xl p-4 text-sm">Underlying system dynamics</li>
+    </ul>
+  </div>
+</section>
+
+<!-- OBJECTIVES -->
+<section id="objectives" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">03 — Objectives</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">What this project sets out to prove</h2>
+  <div class="grid gap-3 sm:grid-cols-2">
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">01</span><span class="text-sm">Derive a generic longitudinal vehicle model and transfer function</span></div>
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">02</span><span class="text-sm">Build a closed-loop cruise control architecture in Simulink</span></div>
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">03</span><span class="text-sm">Design and tune P, PI, PD and PID controllers</span></div>
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">04</span><span class="text-sm">Inject terrain disturbance and quantify rejection</span></div>
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">05</span><span class="text-sm">Benchmark controllers on rise time, overshoot, settling time and SSE</span></div>
+    <div class="glass rounded-xl p-4 flex gap-3"><span class="font-mono text-xs text-sky-400 mt-0.5">06</span><span class="text-sm">Recommend the most suitable controller for the plant class</span></div>
+  </div>
+</section>
+
+<!-- METHODOLOGY -->
+<section id="methodology" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">06 — Methodology</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">How the system was built</h2>
+  <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">Σ</span><span class="font-mono text-xs text-muted">STEP 01</span></div><h4 class="font-semibold mb-1.5">Vehicle Dynamics Modeling</h4><p class="text-sm text-muted">Apply Newton's second law to longitudinal motion with damping for drag and rolling losses.</p></div>
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">⇄</span><span class="font-mono text-xs text-muted">STEP 02</span></div><h4 class="font-semibold mb-1.5">Transfer Function Development</h4><p class="text-sm text-muted">Take the Laplace transform to derive a first-order plant G(s) = 1/(Ms + B).</p></div>
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">▣</span><span class="font-mono text-xs text-muted">STEP 03</span></div><h4 class="font-semibold mb-1.5">Controller Design</h4><p class="text-sm text-muted">Construct P, PI, PD and PID compensators in parallel form against the same plant.</p></div>
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">⚙</span><span class="font-mono text-xs text-muted">STEP 04</span></div><h4 class="font-semibold mb-1.5">Simulation Environment</h4><p class="text-sm text-muted">Build the closed-loop Simulink model with reference, error, actuator, plant and feedback.</p></div>
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">⚠</span><span class="font-mono text-xs text-muted">STEP 05</span></div><h4 class="font-semibold mb-1.5">Disturbance Injection</h4><p class="text-sm text-muted">Apply a step terrain disturbance and additive sensor noise on feedback.</p></div>
+    <div class="glass rounded-2xl p-6 ring-glow"><div class="flex justify-between mb-4"><span class="text-sky-400">📈</span><span class="font-mono text-xs text-muted">STEP 06</span></div><h4 class="font-semibold mb-1.5">Performance Evaluation</h4><p class="text-sm text-muted">Measure rise time, overshoot, settling time, steady-state error and rejection.</p></div>
+  </div>
+</section>
+
+<!-- MODEL -->
+<section id="model" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">07 — Mathematical Model</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Generic longitudinal vehicle dynamics</h2>
+  <div class="grid gap-6 lg:grid-cols-5">
+    <div class="lg:col-span-3 glass rounded-2xl p-8 space-y-6">
+      <div>
+        <div class="font-mono text-xs text-sky-400 mb-2">Vehicle Dynamics (Newton's 2nd law)</div>
+        <div class="rounded-xl border border-border bg-black/30 px-5 py-4 font-mono text-base md:text-lg">M · dv/dt + B · v = F</div>
+      </div>
+      <div>
+        <div class="font-mono text-xs text-sky-400 mb-2">Plant Transfer Function (Laplace)</div>
+        <div class="rounded-xl border border-border bg-black/30 px-5 py-4 font-mono text-base md:text-lg">G(s) = 1 / (M·s + B)</div>
+      </div>
+      <p class="text-sm text-muted">The controller methodology is fully generic. Specific numerical values for <span class="text-fg">M</span> and <span class="text-fg">B</span> are used purely as example test cases during simulation and do not target any particular vehicle.</p>
+    </div>
+    <div class="lg:col-span-2 glass rounded-2xl p-6">
+      <h4 class="font-semibold mb-4 text-sm font-mono text-sky-400">SYMBOLS</h4>
+      <dl class="space-y-3 text-sm">
+        <div class="flex gap-4 border-b border-border/60 pb-2"><span class="font-mono text-sky-400 w-8">M</span><span class="text-muted">Effective vehicle mass</span></div>
+        <div class="flex gap-4 border-b border-border/60 pb-2"><span class="font-mono text-sky-400 w-8">B</span><span class="text-muted">Lumped damping coefficient</span></div>
+        <div class="flex gap-4 border-b border-border/60 pb-2"><span class="font-mono text-sky-400 w-8">F</span><span class="text-muted">Applied tractive force</span></div>
+        <div class="flex gap-4"><span class="font-mono text-sky-400 w-8">v</span><span class="text-muted">Longitudinal velocity</span></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- DESIGN -->
+<section id="design" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">08 — System Design</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Closed-loop Simulink architecture</h2>
+
+  <figure class="glass rounded-2xl p-3 sm:p-4">
+    <div class="rounded-xl overflow-hidden bg-white"><img src="images/simulink-model.png" alt="Simulink model" class="w-full h-auto block" loading="lazy"></div>
+    <figcaption class="text-xs text-muted mt-3 px-2">Overall Simulink model: reference, error junction, PID controller, actuator gain, plant, feedback path with additive noise, and a step disturbance representing terrain.</figcaption>
+  </figure>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Reference Input</div><div class="text-sm text-muted">Driver-set target speed</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Error Junction</div><div class="text-sm text-muted">Difference between reference and measured speed</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Controller</div><div class="text-sm text-muted">P / PI / PD / PID compensator</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Actuator</div><div class="text-sm text-muted">Throttle gain stage (×600)</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Plant</div><div class="text-sm text-muted">1 / (Ms + B) longitudinal dynamics</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Disturbance</div><div class="text-sm text-muted">Step input modelling road grade</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Sensor + Noise</div><div class="text-sm text-muted">Measured speed with additive noise</div></div>
+    <div class="glass rounded-xl p-4"><div class="text-xs font-mono text-sky-400 mb-1">Feedback Loop</div><div class="text-sm text-muted">Closes the system around the controller</div></div>
+  </div>
+
+  <div class="mt-10">
+    <figure class="glass rounded-2xl p-3 sm:p-4">
+      <div class="rounded-xl overflow-hidden bg-white"><img src="images/plant-subsystem.png" alt="Plant subsystem" class="w-full h-auto block" loading="lazy"></div>
+      <figcaption class="text-xs text-muted mt-3 px-2">Plant subsystem with actuator gain, disturbance summation and first-order vehicle transfer function.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- SIMULATION -->
+<section id="simulation" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">09 — Simulation Setup</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Tuning and test conditions</h2>
+  <figure class="glass rounded-2xl p-3 sm:p-4">
+    <div class="rounded-xl overflow-hidden bg-white"><img src="images/pid-tuner.png" alt="PID Tuner" class="w-full h-auto block" loading="lazy"></div>
+    <figcaption class="text-xs text-muted mt-3 px-2">Continuous-time PID controller in parallel form, tuned via Simulink PID Tuner.</figcaption>
+  </figure>
+  <div class="mt-6 grid gap-4 md:grid-cols-2">
+    <div class="glass rounded-2xl p-6">
+      <h4 class="font-semibold mb-3">Tuned PID Parameters</h4>
+      <div class="grid grid-cols-2 gap-3 text-sm font-mono">
+        <div class="rounded-lg border border-border bg-elevated/60 p-3"><div class="text-xs text-muted">P</div><div>0.3395</div></div>
+        <div class="rounded-lg border border-border bg-elevated/60 p-3"><div class="text-xs text-muted">I</div><div>0.01534</div></div>
+        <div class="rounded-lg border border-border bg-elevated/60 p-3"><div class="text-xs text-muted">D</div><div>0.7035</div></div>
+        <div class="rounded-lg border border-border bg-elevated/60 p-3"><div class="text-xs text-muted">N</div><div>0.1947</div></div>
+      </div>
+    </div>
+    <div class="glass rounded-2xl p-6">
+      <h4 class="font-semibold mb-3">Test Conditions</h4>
+      <ul class="text-sm text-muted space-y-2">
+        <li>Continuous-time simulation, 0–700 s</li>
+        <li>Reference step from 0 to target speed</li>
+        <li>Step disturbance applied mid-simulation</li>
+        <li>Sensor noise injected on feedback path</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">10 — Results &amp; Analysis</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Step response and disturbance rejection</h2>
+  <div class="grid gap-8 lg:grid-cols-2">
+    <figure class="glass rounded-2xl p-3 sm:p-4">
+      <div class="rounded-xl overflow-hidden bg-white"><img src="images/step-response.png" alt="Step response" class="w-full h-auto block" loading="lazy"></div>
+      <figcaption class="text-xs text-muted mt-3 px-2">Closed-loop step response (kph) with PID controller.</figcaption>
+    </figure>
+    <figure class="glass rounded-2xl p-3 sm:p-4">
+      <div class="rounded-xl overflow-hidden bg-white"><img src="images/disturbance-response.png" alt="Disturbance response" class="w-full h-auto block" loading="lazy"></div>
+      <figcaption class="text-xs text-muted mt-3 px-2">Velocity in m/s — controller recovers smoothly after the injected terrain disturbance.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section id="comparison" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">11 — Controller Comparison</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">P vs PI vs PD vs PID</h2>
+  <figure class="glass rounded-2xl p-3 sm:p-4">
+    <div class="rounded-xl overflow-hidden bg-white"><img src="images/controller-comparison.png" alt="Controller comparison" class="w-full h-auto block" loading="lazy"></div>
+    <figcaption class="text-xs text-muted mt-3 px-2">Step response of all four controllers against the same plant — PI and PID reach the reference; P and PD plateau below it due to steady-state error.</figcaption>
+  </figure>
+
+  <div class="mt-8 overflow-hidden rounded-2xl glass">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left font-mono text-xs text-muted">
+          <th class="p-4">Controller</th><th class="p-4">Rise Time (s)</th><th class="p-4">Overshoot (%)</th><th class="p-4">Settling Time (s)</th><th class="p-4">SSE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-border/60"><td class="p-4 font-mono text-sky-400">P</td><td class="p-4">18.38</td><td class="p-4">0</td><td class="p-4">32.74</td><td class="p-4">0.146</td></tr>
+        <tr class="border-t border-border/60"><td class="p-4 font-mono text-sky-400">PI</td><td class="p-4">14.59</td><td class="p-4">9.05</td><td class="p-4">74.40</td><td class="p-4 text-emerald-400">✓ 0</td></tr>
+        <tr class="border-t border-border/60"><td class="p-4 font-mono text-sky-400">PD</td><td class="p-4">21.02</td><td class="p-4">0</td><td class="p-4">37.33</td><td class="p-4">0.146</td></tr>
+        <tr class="border-t border-border/60"><td class="p-4 font-mono text-sky-400">PID</td><td class="p-4">17.53</td><td class="p-4">8.54</td><td class="p-4">79.40</td><td class="p-4 text-emerald-400">✓ 0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-amber-400 mb-2">Why P &amp; PD leave steady-state error</h4><p class="text-sm text-muted">The plant is type-0 (no free integrator). Pure proportional or PD action cannot generate the constant force required to fully cancel a constant disturbance, so a residual speed offset remains.</p></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-emerald-400 mb-2">Why PI eliminates SSE</h4><p class="text-sm text-muted">The integral term accumulates error over time and drives it to zero, producing the constant control effort needed to counter constant disturbances.</p></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-amber-400 mb-2">Why PID adds limited benefit</h4><p class="text-sm text-muted">For a first-order plant the derivative term contributes little to stability and amplifies sensor noise — settling time actually worsens slightly versus PI.</p></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-emerald-400 mb-2">Recommended controller: PI</h4><p class="text-sm text-muted">PI delivers zero steady-state error, the fastest rise time, and clean disturbance rejection without unnecessary derivative noise sensitivity.</p></div>
+  </div>
+</section>
+
+<!-- SCOPE -->
+<section id="scope" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">12 — Advantages, Limits &amp; Future</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Project scope</h2>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-emerald-400 mb-4">Advantages</h4><ul class="space-y-2 text-sm text-muted list-disc pl-4"><li>Simple, transparent mathematical model</li><li>Easy to implement and reproduce</li><li>Strong educational value for control theory</li><li>Effective disturbance rejection with PI</li><li>Clear quantitative controller comparison</li></ul></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-amber-400 mb-4">Limitations</h4><ul class="space-y-2 text-sm text-muted list-disc pl-4"><li>Linearized vehicle model only</li><li>No transmission or driveline dynamics</li><li>No actuator saturation modeled</li><li>No nonlinear aerodynamic drag</li><li>No adaptive or predictive control</li></ul></div>
+    <div class="glass rounded-2xl p-6"><h4 class="font-semibold text-sky-400 mb-4">Applications</h4><ul class="space-y-2 text-sm text-muted list-disc pl-4"><li>Cruise Control Systems</li><li>Autonomous Vehicles</li><li>ADAS</li><li>Automotive Control Research</li><li>Engineering Education</li></ul></div>
+  </div>
+  <div class="mt-8 glass rounded-2xl p-8">
+    <h3 class="text-xl font-semibold mb-5 text-sky-400">🚀 Future Scope</h3>
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 text-sm">
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">Adaptive Cruise Control with radar-based headway</div>
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">Model Predictive Control for constraint handling</div>
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">Full state-space and observer-based design</div>
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">Nonlinear vehicle dynamics with tire and grade models</div>
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">Sensor fusion with IMU + GPS + wheel speed</div>
+      <div class="rounded-xl border border-border/60 bg-elevated/40 p-4">AI-assisted longitudinal control policies</div>
+    </div>
+  </div>
+</section>
+
+<!-- APPENDIX -->
+<section id="appendix" class="mx-auto max-w-7xl px-6 py-20 border-t border-border/60">
+  <div class="font-mono text-xs text-sky-400 mb-3">13 — Appendix &amp; References</div>
+  <h2 class="text-2xl md:text-3xl font-semibold tracking-tight max-w-3xl mb-10">Supporting material</h2>
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="glass rounded-2xl p-6 lg:col-span-2">
+      <h4 class="font-semibold mb-3 text-sky-400">Appendix — MATLAB Snippet</h4>
+<pre class="text-xs font-mono leading-relaxed bg-black/40 border border-border rounded-lg p-4 overflow-x-auto"><code>% Generic vehicle plant
+M = 2000;   % example mass [kg]
+B = 35;     % example damping [N·s/m]
+s = tf('s');
+G = 1/(M*s + B);
+
+% Closed-loop controllers
+Kp = 0.3395; Ki = 0.01534; Kd = 0.7035;
+C_P   = pid(Kp);
+C_PI  = pid(Kp, Ki);
+C_PD  = pid(Kp, 0, Kd);
+C_PID = pid(Kp, Ki, Kd);
+
+T = {feedback(C_P*G,1), feedback(C_PI*G,1), ...
+     feedback(C_PD*G,1), feedback(C_PID*G,1)};
+step(T{:}); legend P PI PD PID
+title('Cruise Control Comparison')</code></pre>
+    </div>
+    <div class="glass rounded-2xl p-6">
+      <h4 class="font-semibold mb-3 text-sky-400">References (IEEE)</h4>
+      <ol class="space-y-3 text-xs text-muted list-decimal pl-4">
+        <li>K. Ogata, Modern Control Engineering, 5th ed. Pearson, 2010.</li>
+        <li>G. F. Franklin, J. D. Powell and A. Emami-Naeini, Feedback Control of Dynamic Systems, 8th ed. Pearson, 2019.</li>
+        <li>R. Rajamani, Vehicle Dynamics and Control, 2nd ed. Springer, 2012.</li>
+        <li>MathWorks, "PID Controller Tuning in Simulink," Simulink Control Design Documentation.</li>
+        <li>Å. Aström and T. Hägglund, Advanced PID Control, ISA, 2006.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer class="border-t border-border/60 mt-10">
+  <div class="mx-auto max-w-7xl px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-muted font-mono">
+    <div>cruise_control.sim · Control Systems Mini-Project</div>
+    <div>Built with MATLAB · Simulink · Control System Toolbox</div>
+  </div>
+</footer>
+
+</body>
+</html>
