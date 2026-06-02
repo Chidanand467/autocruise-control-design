@@ -166,7 +166,7 @@ function Portfolio() {
             { icon: Workflow, t: "Feedback control", d: "Closed-loop architectures provide disturbance rejection and reference tracking that open-loop maps cannot achieve." },
             { icon: Sigma, t: "PID controllers", d: "The proportional-integral-derivative family remains the workhorse of industrial control thanks to tunability and predictable behavior." },
             { icon: Cpu, t: "Automotive control", d: "Modern powertrain and chassis ECUs rely on layered PID, gain scheduling and model-based approaches for safety-critical loops." },
-          ].map(x => <Card key={x.t} {...x}>{x.d}</Card>)}
+          ].map(x => <Card key={x.t} icon={x.icon} title={x.t}>{x.d}</Card>)}
         </div>
       </Section>
 
