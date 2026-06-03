@@ -460,5 +460,34 @@ title('Cruise Control Comparison')</code></pre>
   </div>
 </footer>
 
+<script>
+(function() {
+  const html = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const moon = document.getElementById('moonIcon');
+  const sun = document.getElementById('sunIcon');
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      moon.classList.add('hidden');
+      sun.classList.remove('hidden');
+    } else {
+      moon.classList.remove('hidden');
+      sun.classList.add('hidden');
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { applyTheme(saved); }
+
+  btn.addEventListener('click', function() {
+    const current = html.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+})();
+</script>
+
 </body>
 </html>
