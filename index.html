@@ -14,6 +14,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
+  darkMode: 'selector',
   theme: {
     extend: {
       fontFamily: {
@@ -21,31 +22,76 @@ tailwind.config = {
         mono: ['"JetBrains Mono"','ui-monospace','monospace'],
       },
       colors: {
-        bg:         '#0a0e14',
-        surface:    '#0f141c',
-        elevated:   '#141b26',
-        border:     '#1f2937',
-        muted:      '#94a3b8',
-        fg:         '#e5e7eb',
-        primary:    '#38bdf8',
-        primaryDim: '#0ea5e9',
-        success:    '#22d3a5',
-        warning:    '#fbbf24',
+        bg:         'var(--bg)',
+        surface:    'var(--surface)',
+        elevated:   'var(--elevated)',
+        border:     'var(--border)',
+        muted:      'var(--muted)',
+        fg:         'var(--fg)',
+        primary:    'var(--primary)',
+        primaryDim: 'var(--primaryDim)',
+        success:    'var(--success)',
+        warning:    'var(--warning)',
       },
     }
   }
 }
 </script>
 <style>
-  html,body{background:#0a0e14;color:#e5e7eb;font-family:Inter,system-ui,sans-serif}
-  .glass{background:linear-gradient(180deg,rgba(20,27,38,.7),rgba(15,20,28,.55));backdrop-filter:blur(8px);border:1px solid rgba(31,41,55,.8)}
-  .ring-glow:hover{box-shadow:0 0 0 1px rgba(56,189,248,.4),0 8px 30px -8px rgba(56,189,248,.45)}
-  .grid-bg{background-image:linear-gradient(rgba(56,189,248,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.08) 1px,transparent 1px);background-size:48px 48px}
-  .text-gradient{background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  :root {
+    --bg:         #0a0e14;
+    --surface:    #0f141c;
+    --elevated:   #141b26;
+    --border:     #1f2937;
+    --muted:      #94a3b8;
+    --fg:         #e5e7eb;
+    --primary:    #38bdf8;
+    --primaryDim: #0ea5e9;
+    --success:    #22d3a5;
+    --warning:    #fbbf24;
+    --glass-top:  rgba(20,27,38,.7);
+    --glass-bot:  rgba(15,20,28,.55);
+    --glass-border: rgba(31,41,55,.8);
+    --ring-color: rgba(56,189,248,.4);
+    --ring-shadow: rgba(56,189,248,.45);
+    --grid-color: rgba(56,189,248,.08);
+    --table-head: rgba(20,27,38,.7);
+    --code-bg:    rgba(0,0,0,.3);
+    --img-bg:     #ffffff;
+  }
+  html[data-theme="light"] {
+    --bg:         #ffffff;
+    --surface:    #f8fafc;
+    --elevated:   #f1f5f9;
+    --border:     #e2e8f0;
+    --muted:      #475569;
+    --fg:         #0f172a;
+    --primary:    #0284c7;
+    --primaryDim: #0369a1;
+    --success:    #059669;
+    --warning:    #d97706;
+    --glass-top:  rgba(255,255,255,.7);
+    --glass-bot:  rgba(248,250,252,.55);
+    --glass-border: rgba(226,232,240,.8);
+    --ring-color: rgba(2,132,199,.4);
+    --ring-shadow: rgba(2,132,199,.25);
+    --grid-color: rgba(2,132,199,.08);
+    --table-head: rgba(241,245,249,.7);
+    --code-bg:    rgba(241,245,249,.6);
+    --img-bg:     #ffffff;
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif}
+  .glass{background:linear-gradient(180deg,var(--glass-top),var(--glass-bot));backdrop-filter:blur(8px);border:1px solid var(--glass-border)}
+  .ring-glow:hover{box-shadow:0 0 0 1px var(--ring-color),0 8px 30px -8px var(--ring-shadow)}
+  .grid-bg{background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:48px 48px}
+  .text-gradient{background:linear-gradient(90deg,var(--primary),#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[data-theme="light"] .text-gradient{background:linear-gradient(90deg,var(--primary),#7c3aed)}
   .font-mono{font-family:"JetBrains Mono",ui-monospace,monospace}
   html{scroll-behavior:smooth}
   section[id]{scroll-margin-top:5rem}
-  table thead{background:rgba(20,27,38,.7)}
+  table thead{background:var(--table-head)}
+  pre code{background:var(--code-bg)}
+  .simulink-img{background:var(--img-bg)}
 </style>
 </head>
 <body class="min-h-screen">
