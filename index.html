@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -14,6 +14,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
+  darkMode: 'selector',
   theme: {
     extend: {
       fontFamily: {
@@ -21,31 +22,76 @@ tailwind.config = {
         mono: ['"JetBrains Mono"','ui-monospace','monospace'],
       },
       colors: {
-        bg:         '#0a0e14',
-        surface:    '#0f141c',
-        elevated:   '#141b26',
-        border:     '#1f2937',
-        muted:      '#94a3b8',
-        fg:         '#e5e7eb',
-        primary:    '#38bdf8',
-        primaryDim: '#0ea5e9',
-        success:    '#22d3a5',
-        warning:    '#fbbf24',
+        bg:         'var(--bg)',
+        surface:    'var(--surface)',
+        elevated:   'var(--elevated)',
+        border:     'var(--border)',
+        muted:      'var(--muted)',
+        fg:         'var(--fg)',
+        primary:    'var(--primary)',
+        primaryDim: 'var(--primaryDim)',
+        success:    'var(--success)',
+        warning:    'var(--warning)',
       },
     }
   }
 }
 </script>
 <style>
-  html,body{background:#0a0e14;color:#e5e7eb;font-family:Inter,system-ui,sans-serif}
-  .glass{background:linear-gradient(180deg,rgba(20,27,38,.7),rgba(15,20,28,.55));backdrop-filter:blur(8px);border:1px solid rgba(31,41,55,.8)}
-  .ring-glow:hover{box-shadow:0 0 0 1px rgba(56,189,248,.4),0 8px 30px -8px rgba(56,189,248,.45)}
-  .grid-bg{background-image:linear-gradient(rgba(56,189,248,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.08) 1px,transparent 1px);background-size:48px 48px}
-  .text-gradient{background:linear-gradient(90deg,#38bdf8,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  :root {
+    --bg:         #0a0e14;
+    --surface:    #0f141c;
+    --elevated:   #141b26;
+    --border:     #1f2937;
+    --muted:      #94a3b8;
+    --fg:         #e5e7eb;
+    --primary:    #38bdf8;
+    --primaryDim: #0ea5e9;
+    --success:    #22d3a5;
+    --warning:    #fbbf24;
+    --glass-top:  rgba(20,27,38,.7);
+    --glass-bot:  rgba(15,20,28,.55);
+    --glass-border: rgba(31,41,55,.8);
+    --ring-color: rgba(56,189,248,.4);
+    --ring-shadow: rgba(56,189,248,.45);
+    --grid-color: rgba(56,189,248,.08);
+    --table-head: rgba(20,27,38,.7);
+    --code-bg:    rgba(0,0,0,.3);
+    --img-bg:     #ffffff;
+  }
+  html[data-theme="light"] {
+    --bg:         #ffffff;
+    --surface:    #f8fafc;
+    --elevated:   #f1f5f9;
+    --border:     #e2e8f0;
+    --muted:      #475569;
+    --fg:         #0f172a;
+    --primary:    #0284c7;
+    --primaryDim: #0369a1;
+    --success:    #059669;
+    --warning:    #d97706;
+    --glass-top:  rgba(255,255,255,.7);
+    --glass-bot:  rgba(248,250,252,.55);
+    --glass-border: rgba(226,232,240,.8);
+    --ring-color: rgba(2,132,199,.4);
+    --ring-shadow: rgba(2,132,199,.25);
+    --grid-color: rgba(2,132,199,.08);
+    --table-head: rgba(241,245,249,.7);
+    --code-bg:    rgba(241,245,249,.6);
+    --img-bg:     #ffffff;
+  }
+  html,body{background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif}
+  .glass{background:linear-gradient(180deg,var(--glass-top),var(--glass-bot));backdrop-filter:blur(8px);border:1px solid var(--glass-border)}
+  .ring-glow:hover{box-shadow:0 0 0 1px var(--ring-color),0 8px 30px -8px var(--ring-shadow)}
+  .grid-bg{background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:48px 48px}
+  .text-gradient{background:linear-gradient(90deg,var(--primary),#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  html[data-theme="light"] .text-gradient{background:linear-gradient(90deg,var(--primary),#7c3aed)}
   .font-mono{font-family:"JetBrains Mono",ui-monospace,monospace}
   html{scroll-behavior:smooth}
   section[id]{scroll-margin-top:5rem}
-  table thead{background:rgba(20,27,38,.7)}
+  table thead{background:var(--table-head)}
+  pre code{background:var(--code-bg)}
+  .simulink-img{background:var(--img-bg)}
 </style>
 </head>
 <body class="min-h-screen">
@@ -66,10 +112,18 @@ tailwind.config = {
       <a href="#results" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Results</a>
       <a href="#scope" class="px-3 py-1.5 rounded-md hover:text-fg hover:bg-elevated">Scope</a>
     </nav>
-    <a href="https://github.com/chidanandkarennavar/control-systems-portfolio" target="_blank" rel="noreferrer"
-       class="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-elevated">
-      GitHub
-    </a>
+    <div class="flex items-center gap-2">
+      <button id="themeToggle" aria-label="Toggle dark/light mode"
+              class="inline-flex items-center justify-center w-8 h-8 rounded-md border border-border bg-surface/60 hover:bg-elevated transition-colors"
+              title="Toggle theme">
+        <svg id="moonIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg id="sunIcon" class="w-4 h-4 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+      <a href="https://github.com/chidanandkarennavar/control-systems-portfolio" target="_blank" rel="noreferrer"
+         class="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs hover:bg-elevated">
+        GitHub
+      </a>
+    </div>
   </div>
 </header>
 
@@ -405,6 +459,35 @@ title('Cruise Control Comparison')</code></pre>
     </div>
   </div>
 </footer>
+
+<script>
+(function() {
+  const html = document.documentElement;
+  const btn = document.getElementById('themeToggle');
+  const moon = document.getElementById('moonIcon');
+  const sun = document.getElementById('sunIcon');
+
+  function applyTheme(theme) {
+    html.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      moon.classList.add('hidden');
+      sun.classList.remove('hidden');
+    } else {
+      moon.classList.remove('hidden');
+      sun.classList.add('hidden');
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  const saved = localStorage.getItem('theme');
+  if (saved) { applyTheme(saved); }
+
+  btn.addEventListener('click', function() {
+    const current = html.getAttribute('data-theme') || 'dark';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+})();
+</script>
 
 </body>
 </html>
